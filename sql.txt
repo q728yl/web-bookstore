@@ -1,0 +1,145 @@
+
+
+USE bookstore;
+
+
+
+DROP TABLE if exists orderItem;
+DROP TABLE if exists orders;
+DROP TABLE if exists cart;
+DROP table if exists book_details;
+DROP table if exists user_auth;
+DROP TABLE if exists users;
+
+-- 创建用户表
+CREATE TABLE IF NOT EXISTS users (
+                                     id INT NOT NULL AUTO_INCREMENT,
+                                     username VARCHAR(50) NOT NULL UNIQUE,
+                                     email VARCHAR(50) NOT NULL ,
+                                     address VARCHAR(255),
+                                     user_type INT NOT NULL,
+                                     comments VARCHAR(255) NOT NULL,
+                                     status INT NOT NULL ,
+                                     PRIMARY KEY (id)
+);
+# DELETE FROM users;
+ALTER TABLE users AUTO_INCREMENT = 1;
+INSERT INTO users (username,  email, address,user_type,comments,status) VALUES ('qyl728', '3541441990@qq.com', '东川路800号',0,'无',1);
+INSERT INTO users (username,  email, address,user_type,comments,status) VALUES ('pp',  '30685025@qq.com', '东川路800号',1,'无',1);
+INSERT INTO users (username,  email, address,user_type,comments,status) VALUES ('b',  '3085025@qq.com', '东川800号',1,'无',1);
+SELECT *FROM users;
+
+DROP table if exists user_auth;
+CREATE TABLE IF NOT EXISTS user_auth (
+
+                                         user_id INT NOT NULL AUTO_INCREMENT,
+                                         password VARCHAR(255) NOT NULL,
+                                         PRIMARY KEY (user_id),
+                                         FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+INSERT INTO user_auth ( password) VALUES ('qyl728728');
+INSERT INTO user_auth ( password) VALUES ('235711zch');
+INSERT INTO user_auth ( password) VALUES ('35711zch');
+SELECT *FROM user_auth;
+
+
+
+DROP table if exists book_details;
+-- 创建书籍详情表
+CREATE TABLE IF NOT EXISTS book_details (
+                                            id INT NOT NULL AUTO_INCREMENT,
+                                            title VARCHAR(255) NOT NULL,
+                                            IBSN VARCHAR(255) NOT NULL,
+                                            author VARCHAR(255) NOT NULL,
+                                            image VARCHAR(255) NOT NULL,
+                                            description VARCHAR(1000) NOT NULL,
+                                            price DECIMAL(10, 2) NOT NULL,
+                                            rating DECIMAL(3, 1) NOT NULL,
+                                            in_stock BOOLEAN NOT NULL,
+                                            quantity INT NOT NULL,
+                                            PRIMARY KEY (id)
+
+);
+-- 插入数据
+ALTER TABLE book_details AUTO_INCREMENT = 1;
+INSERT INTO book_details (title,IBSN ,author, image, description, price, rating, in_stock,quantity)
+VALUES
+    ('软件工程原理',9875427381, '沈备军 陈昊鹏', 'https://th.bing.com/th/id/OIP._9rw022KHj4tXUbW63ZmogAAAA?pid=ImgDet&rs=1', 'An Easy & Proven Way to understand principles of software engineering', 3.99, 4.5, true,70),
+    ('电路基础', 29392483984,'陈洪亮 张峰', 'https://img14.360buyimg.com/n1/jfs/t5596/163/4226098132/202575/b50b23fc/5948d3c3Nd11df282.jpg', 'How Today’s Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses', 5.99, 4.2, true,7),
+    ('数据结构（C++语言版）',7286273292, '邓俊辉', 'https://img12.360buyimg.com/n1/jfs/t3880/80/1575217019/204635/388ee279/587f4164N032b7285.jpg', 'Rules for data structure with c++', 4.99, 4.7, true,23),
+    ('计算机系统基础汇编',3749876549, '兰德尔 布莱恩特', 'https://th.bing.com/th/id/R.da95b543db9a04913e2ffb2d9b17fc66?rik=SEgMeAKApFlgLw&riu=http%3a%2f%2fmancos-co.aap5.com%2fpic%2f5afre14niyx.jpg&ehk=R4W34MP%2fopPhN%2b1zupk2lWawe5GeWnqOvwKTRKETP7g%3d&risl=&pid=ImgRaw&r=0', 'Rules for Compilation of computer system fundamentals', 4.99, 4.7, true,56);
+SELECT *FROM book_details;
+
+
+DROP TABLE if exists cart;
+SET  FOREIGN_KEY_CHECKS=0;
+
+-- 购物车信息链接在book_details上
+CREATE TABLE IF NOT EXISTS cart (
+                                    id INT NOT NULL AUTO_INCREMENT,
+                                    user_id INT NOT NULL,
+                                    book_details_id INT NOT NULL,
+                                    quantity INT NOT NULL,
+                                    PRIMARY KEY (id),
+                                    FOREIGN KEY (user_id) REFERENCES users(id),
+                                    FOREIGN KEY (book_details_id) REFERENCES book_details(id)
+);
+
+ALTER TABLE cart AUTO_INCREMENT = 1;
+INSERT INTO cart (user_id, book_details_id, quantity) VALUES (1, 1, 2);
+INSERT INTO cart (user_id, book_details_id, quantity) VALUES (1, 3, 2);
+INSERT INTO cart (user_id, book_details_id, quantity) VALUES (2, 2, 2);
+INSERT INTO cart (user_id, book_details_id, quantity) VALUES (3, 4, 1);
+INSERT INTO cart (user_id, book_details_id, quantity) VALUES (3, 1, 3);
+SELECT *FROM cart;
+
+
+
+# DELETE FROM cart WHERE user_id = 1;
+
+
+
+DROP TABLE if exists orders;
+SET  FOREIGN_KEY_CHECKS=0;
+-- 创建订单表
+CREATE TABLE IF NOT EXISTS orders (
+                                      id INT NOT NULL AUTO_INCREMENT,
+                                      user_id INT NOT NULL,
+                                      order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                      PRIMARY KEY (id),
+                                      FOREIGN KEY (user_id) REFERENCES users(id)
+
+
+);
+# DELETE FROM orders WHERE id BETWEEN 1 AND 6;
+
+-- 插入订单数据
+INSERT INTO orders (user_id) VALUES
+                                         (1),
+                                         (1),
+                                         (2),
+                                         (2);
+SELECT *FROM orders;
+
+
+DROP TABLE if exists orderItem;
+SET  FOREIGN_KEY_CHECKS=0;
+CREATE TABLE IF NOT EXISTS orderItem (
+                                         id INT NOT NULL AUTO_INCREMENT,
+                                         order_id INT NOT NULL,
+                                         book_details_id INT NOT NULL,
+                                         quantity INT NOT NULL,
+
+                                         status INT NOT NULL,
+                                         PRIMARY KEY (id),
+                                         FOREIGN KEY (order_id) REFERENCES orders(id),
+                                         FOREIGN KEY (book_details_id) REFERENCES book_details(id)
+);
+INSERT INTO orderItem (order_id,book_details_id,quantity,status) VALUES
+                                                                  (1, 1,3,0),
+                                                                  (1, 2,2,1),
+                                                                  (2, 3,1,1),
+                                                                  (2, 1,2,2),
+                                                                  (3, 4,2,3),
+                                                                  (4, 2,3,3);
