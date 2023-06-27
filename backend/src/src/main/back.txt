@@ -1,0 +1,36 @@
+import React, { useState, useEffect } from 'react';
+
+function BookList() {
+    const [Bt, setBt] = useState([]);
+
+    useEffect(() => {
+        fetch("/getList")
+            .then(response => response.json())
+            .then(data => {
+                // 在这里处理返回的数据，设置bookList的状态
+                setBt(data["Bt"]);
+            })
+.catch(error => console.error(error));
+    }, []);
+
+    return (
+        <div>
+            <div>Book List</div>
+            <div>
+                {Bt.map(book => (
+                    <div key={book.id}>
+                        <h2>{book.title}</h2>
+                        <p>{book.author}</p>
+                        <img src={book.image} alt={book.title} />
+                        <p>{book.description}</p>
+                        <p>{book.price}</p>
+                        <p>{book.rating}</p>
+                        <p>{book.inStock ? 'In Stock' : 'Out of Stock'}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export default BookList;
